@@ -7,13 +7,14 @@ import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;  
 import org.ksoap2.serialization.SoapSerializationEnvelope;  
 import org.ksoap2.transport.HttpTransportSE;  
-import android.annotation.SuppressLint;  
+//import android.annotation.SuppressLint;  
 /** 
  * 访问Web Service的工具类 
  * @author jCuckoo 
  *  
  */  
-@SuppressLint("NewApi")  
+//屏蔽一切新api中才能使用的方法报的android lint错误
+//@SuppressLint("NewApi")  
 public class WebServiceHelper {  
 //    static {  
 //        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.ICE_CREAM_SANDWICH){  
@@ -37,8 +38,8 @@ public class WebServiceHelper {
      */  
     public static SoapObject getSoapObject(String serviceName,  
             String methodName, String soapAction, HashMap<String, Object> params) {  
-        String URL = "http://192.168.31.161:8080/CXFWebservice/"+ serviceName + "?wsdl";  
-        String NAMESPACE = "http://iservice.java.com/";// 名称空间，服务器端生成的namespace属性值  
+        String URL = ConfigHelper.getUrl()+ serviceName + "?wsdl";  
+        String NAMESPACE = ConfigHelper.getNameSpace();// 名称空间，服务器端生成的namespace属性值  
         String METHOD_NAME = methodName;  
         String SOAP_ACTION = soapAction;  
   

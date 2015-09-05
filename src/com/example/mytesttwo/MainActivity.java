@@ -5,47 +5,217 @@ import java.util.HashMap;
 
 import org.ksoap2.serialization.SoapObject;
 
+//import com.xiaowu.bottomtab.demo.IWantKnowFragment;
+//import com.xiaowu.bottomtab.demo.MeFragment;
+//import com.xiaowu.bottomtab.demo.R;
+//import com.xiaowu.bottomtab.demo.ZhidaoFragment;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity implements OnClickListener{
+	
+	// 三个tab布局
+	private RelativeLayout knowLayout, iWantKnowLayout, meLayout;
 
+	// 底部标签切换的Fragment
+	private Fragment knowFragment, iWantKnowFragment, meFragment,
+			currentFragment;
+	// 底部标签图片
+	private ImageView knowImg, iWantKnowImg, meImg;
+	// 底部标签的文本
+	private TextView knowTv, iWantKnowTv, meTv;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		t=(TextView) findViewById(R.id.kuanTextView1); 
-		
-		loginButton=(Button) findViewById(R.id.login_Button);  
-		userNameEditText=(EditText) findViewById(R.id.userName); 
-        loginButton.setOnClickListener(new OnClickListener() {  
-            @Override  
-            public void onClick(View arg0) {  
-                String userName=userNameEditText.getText().toString();  
-                if("".equals(userName)){  
-                    Toast.makeText(MainActivity.this, "用户名不能为空", Toast.LENGTH_LONG).show();  
-                }  
-                
-                DoSomething ds1 = new DoSomething(userName);
-                Thread t1 = new Thread(ds1);
-                t1.start();
-            }  
-        });  
+		if (savedInstanceState == null) {
+            // We were just launched 
+			initUI();
+			initTab();
+            
+        } else {
+            // We are being restored
+            //Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
+//        	if (map != null) {
+//                mSnakeView.restoreState(map);
+//            } else {
+//                mSnakeView.setMode(SnakeView.PAUSE);
+//            }
+        }
 		
 		
 	}
 
+	
+//	@Override
+//	protected void onSaveInstanceState(Bundle savedInstanceState) {
+//		System.out.println("************onSaveInstanceState");
+//		super.onSaveInstanceState(savedInstanceState);
+//		//savedInstanceState.putBundle(ICICLE_KEY, mSnakeView.saveState());
+//	}
+	
+	/**
+	 * 初始化UI
+	 */
+	private void initUI() {
+		knowLayout = (RelativeLayout) findViewById(R.id.rl_know);
+		iWantKnowLayout = (RelativeLayout) findViewById(R.id.rl_want_know);
+		meLayout = (RelativeLayout) findViewById(R.id.rl_me);
+		knowLayout.setOnClickListener(this);
+		iWantKnowLayout.setOnClickListener(this);
+		meLayout.setOnClickListener(this);
+
+		knowImg = (ImageView) findViewById(R.id.iv_know);
+		iWantKnowImg = (ImageView) findViewById(R.id.iv_i_want_know);
+		meImg = (ImageView) findViewById(R.id.iv_me);
+		knowTv = (TextView) findViewById(R.id.tv_know);
+		iWantKnowTv = (TextView) findViewById(R.id.tv_i_want_know);
+		meTv = (TextView) findViewById(R.id.tv_me);
+
+	}
+
+	/**
+	 * 初始化底部标签
+	 */
+	private void initTab() {
+		if (knowFragment == null) {
+			knowFragment = new Tab1();
+		}
+
+		if (!knowFragment.isAdded()) {
+			// 提交事务
+			getSupportFragmentManager().beginTransaction()
+					.add(R.id.content_layout, knowFragment).commit();
+
+			// 记录当前Fragment
+			currentFragment = knowFragment;
+			// 设置图片文本的变化
+			knowImg.setImageResource(R.drawable.btn_know_pre);
+			knowTv.setTextColor(getResources()
+					.getColor(R.color.bottomtab_press));
+			iWantKnowImg.setImageResource(R.drawable.btn_wantknow_nor);
+			iWantKnowTv.setTextColor(getResources().getColor(
+					R.color.bottomtab_normal));
+			meImg.setImageResource(R.drawable.btn_my_nor);
+			meTv.setTextColor(getResources().getColor(R.color.bottomtab_normal));
+
+		}
+
+	}
+	
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.rl_know: // 知道
+			clickTab1Layout();
+			break;
+		case R.id.rl_want_know: // 我想知道
+			clickTab2Layout();
+			break;
+		case R.id.rl_me: // 我的
+			clickTab3Layout();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	/**
+	 * 点击第一个tab
+	 */
+	private void clickTab1Layout() {
+		if (knowFragment == null) {
+			knowFragment = new Tab1();
+		}
+		addOrShowFragment(getSupportFragmentManager().beginTransaction(), knowFragment);
+		
+		// 设置底部tab变化
+		knowImg.setImageResource(R.drawable.btn_know_pre);
+		knowTv.setTextColor(getResources().getColor(R.color.bottomtab_press));
+		iWantKnowImg.setImageResource(R.drawable.btn_wantknow_nor);
+		iWantKnowTv.setTextColor(getResources().getColor(
+				R.color.bottomtab_normal));
+		meImg.setImageResource(R.drawable.btn_my_nor);
+		meTv.setTextColor(getResources().getColor(R.color.bottomtab_normal));
+	}
+	
+	/**
+	 * 点击第二个tab
+	 */
+	private void clickTab2Layout() {
+		if (iWantKnowFragment == null) {
+			iWantKnowFragment = new Tab2();
+		}
+		addOrShowFragment(getSupportFragmentManager().beginTransaction(), iWantKnowFragment);
+		
+		knowImg.setImageResource(R.drawable.btn_know_nor);
+		knowTv.setTextColor(getResources().getColor(R.color.bottomtab_normal));
+		iWantKnowImg.setImageResource(R.drawable.btn_wantknow_pre);
+		iWantKnowTv.setTextColor(getResources().getColor(
+				R.color.bottomtab_press));
+		meImg.setImageResource(R.drawable.btn_my_nor);
+		meTv.setTextColor(getResources().getColor(R.color.bottomtab_normal));
+
+	}
+
+	/**
+	 * 点击第三个tab
+	 */
+	private void clickTab3Layout() {
+		if (meFragment == null) {
+			meFragment = new Tab3();
+		}
+		
+		addOrShowFragment(getSupportFragmentManager().beginTransaction(), meFragment);
+		knowImg.setImageResource(R.drawable.btn_know_nor);
+		knowTv.setTextColor(getResources().getColor(R.color.bottomtab_normal));
+		iWantKnowImg.setImageResource(R.drawable.btn_wantknow_nor);
+		iWantKnowTv.setTextColor(getResources().getColor(
+				R.color.bottomtab_normal));
+		meImg.setImageResource(R.drawable.btn_my_pre);
+		meTv.setTextColor(getResources().getColor(R.color.bottomtab_press));
+		
+	}
+
+	/**
+	 * 添加或者显示碎片
+	 * 
+	 * @param transaction
+	 * @param fragment
+	 */
+	private void addOrShowFragment(FragmentTransaction transaction,
+			Fragment fragment) {
+		if (currentFragment == fragment)
+			return;
+
+		if (!fragment.isAdded()) { // 如果当前fragment未被添加，则添加到Fragment管理器中
+			transaction.hide(currentFragment)
+					.add(R.id.content_layout, fragment).commit();
+		} else {
+			transaction.hide(currentFragment).show(fragment).commit();
+		}
+
+		currentFragment = fragment;
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -65,56 +235,4 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-
-	private EditText userNameEditText;  
-    private EditText userPwdEditText;  
-    private Button loginButton; 
-    private TextView t;
-	
-	public class DoSomething implements Runnable {
-	    private String name;
-
-	    public DoSomething(String name) {
-	        this.name = name;
-	    }
-
-	    public void run() {
-	    	Message msg = new Message();
-	    	msg.what = 1;
-	        HashMap<String, Object> paramsMap = new HashMap<String, Object>();  
-	        paramsMap.put("name", name);  
-	        SoapObject a= WebServiceHelper.getSoapObject("Users", "getUserList", null, paramsMap);
-	        System.out.println("result:"+a.toString());
-	        msg.obj=a;
-            handler.sendMessage(msg);
-	    }
-	}
-	
-	private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            //findViewById(R.id.Btn_Login).setEnabled(true);
-            switch (msg.what)
-            {
-                case -1:
-                    //exception
-                    //MessageHelper.AlertDialog(Activity_Main.this, "异常提示", msg.obj.toString());
-                    System.out.println("异常提示:"+msg.obj.toString());
-                    break;
-                case 0:
-                    //fail
-                    //MessageHelper.AlertDialog(Activity_Main.this, "错误提示", msg.obj.toString());
-                    System.out.println("错误:"+msg.obj.toString());
-                    break;
-                case 1:
-                    //login success
-                    //MessageHelper.AlertDialog(Activity_Main.this, "操作提示", "登录成功。");
-        	        t.setText(msg.obj.toString()); 
-                    System.out.println("操作提示:登录成功");
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 }
